@@ -13,7 +13,7 @@ class LeggedRobotCfg(BaseConfig):
         observe_gait_commands=True
 
     class terrain:
-        mesh_type = 'plane' # "heightfield" # none, plane, heightfield or trimesh
+        mesh_type = 'trimesh' # "heightfield" # none, plane, heightfield or trimesh
         horizontal_scale = 0.1 # [m]
         vertical_scale = 0.005 # [m]
         border_size = 25 # [m]
@@ -23,17 +23,20 @@ class LeggedRobotCfg(BaseConfig):
         restitution = 0.
         # rough terrain only:
         measure_heights = True
-        measured_points_x = [-0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8] # 1mx1.6m rectangle (without center line)
+        measured_points_x = [-0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7,
+                            0.8]  # 1mx1.6m rectangle (without center line)
         measured_points_y = [-0.5, -0.4, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.4, 0.5]
+        # measured_points_x = [-0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8] # 1mx1.6m rectangle (without center line)
+        # measured_points_y = [-0.5, -0.4, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.4, 0.5]
         selected = False # select a unique terrain type and pass all arguments
         terrain_kwargs = None # Dict of arguments for selected terrain
         max_init_terrain_level = 5 # starting curriculum state
         terrain_length = 8.
         terrain_width = 8.
-        num_rows= 10 # number of terrain rows (levels)
+        num_rows= 20 # number of terrain rows (levels)
         num_cols = 20 # number of terrain cols (types)
         # terrain types: [smooth slope, rough slope, stairs up, stairs down, discrete]
-        terrain_proportions = [0.1, 0.1, 0.35, 0.25, 0.2]
+        terrain_proportions = [0.1, 0.5, 0.1, 0.1, 0.2]
         # trimesh only:
         slope_treshold = 0.75 # slopes above this threshold will be corrected to vertical surfaces
 
@@ -44,8 +47,8 @@ class LeggedRobotCfg(BaseConfig):
         resampling_time = 10. # time before command are changed[s]
         heading_command = True # if true: compute ang vel command from heading error
         class ranges:
-            lin_vel_x = [-1.0, 1.0] # min max [m/s]
-            lin_vel_y = [-1.0, 1.0]   # min max [m/s]
+            lin_vel_x = [-1.0, 4.0] # min max [m/s]
+            lin_vel_y = [-2, 2]   # min max [m/s]
             ang_vel_yaw = [-1, 1]    # min max [rad/s]
             heading = [-3.14, 3.14]
 
@@ -80,7 +83,7 @@ class LeggedRobotCfg(BaseConfig):
         default_dof_drive_mode = 3 # see GymDofDriveModeFlags (0 is none, 1 is pos tgt, 2 is vel tgt, 3 effort)
         self_collisions = 0 # 1 to disable, 0 to enable...bitwise filter
         replace_cylinder_with_capsule = True # replace collision cylinders with capsules, leads to faster/more stable simulation
-        flip_visual_attachments = True # Some .obj meshes must be flipped from y-up to z-up
+        flip_visual_attachments = False # Some .obj meshes must be flipped from y-up to z-up
         
         density = 0.001
         angular_damping = 0.
@@ -92,41 +95,50 @@ class LeggedRobotCfg(BaseConfig):
 
     class domain_rand:
         randomize_friction = True
-        friction_range = [0.5, 1.25]
-        randomize_base_mass = False
-        added_mass_range = [-1., 1.]
+        friction_range = [0.2, 2.5]
+        randomize_base_mass = True
+        added_mass_range = [-2., 3.]
         push_robots = True
         push_interval_s = 15
         max_push_vel_xy = 1.
 
+
+
+        randomize_kpkd = True
+        kp_range = [0.8,1.2]
+        kd_range = [0.8,1.2]
+
+
+        randomize_lag_timesteps = True
+        lag_timesteps = 3
     class rewards:
         class scales:
             termination = -0.0
-            tracking_lin_vel = 1.0
+            tracking_lin_vel = 4.0
             tracking_ang_vel = 0.5
             lin_vel_z = -2.0
             ang_vel_xy = -0.05
-            orientation = -0.1
+            orientation = -0.2
             torques = -0.00001
             dof_vel = -0.
             dof_acc = -2.5e-7
-            base_height = 0.1
+            base_height = 0.2
             # feet_air_time =  1.0
             collision = -1.
             feet_stumble = -0.0 
             action_rate = -0.01
-            stand_still = -0.1
+            stand_still = -1
             # ___________________
             # contacts_shaped_force=4.0
             # contacts_shaped_vel = 4.0
             # feet_height=0.05
             # hip_pos=-0.2
-            raibert_heuristic=-1.0
+            raibert_heuristic=-2.0
             # __________________
 
         only_positive_rewards = True # if true negative total rewards are clipped at zero (avoids early termination problems)
         tracking_sigma = 0.25 # tracking reward = exp(-error^2/sigma)
-        base_height_sigma = 0.05
+        base_height_sigma = 0.01
         soft_dof_pos_limit = 1. # percentage of urdf limits, values above this limit are penalized
         soft_dof_vel_limit = 1.
         soft_torque_limit = 1.
@@ -135,6 +147,7 @@ class LeggedRobotCfg(BaseConfig):
         # ---------------------------
         # gait_force_sigma=50
         # gait_vel_sigma = 10.
+        stand_still_sigma=0.0001
         # ----------------------------
 
     class normalization:
@@ -215,10 +228,10 @@ class LeggedRobotCfgPPO(BaseConfig):
         policy_class_name = 'ActorCritic'
         algorithm_class_name = 'PPO'
         num_steps_per_env = 24 # per iteration
-        max_iterations = 1500 # number of policy updates
+        max_iterations = 2500 # number of policy updates
 
         # logging
-        save_interval = 50 # check for potential saves every this many iterations
+        save_interval = 500 # check for potential saves every this many iterations
         experiment_name = 'test'
         run_name = ''
         # load and resume

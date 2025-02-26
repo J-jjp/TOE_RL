@@ -16,6 +16,6 @@ def train(args):
 if __name__ == '__main__':
     args = get_args()
     log_dir = f"log/1"
-    wandb.init(project='genesis', name="legged", dir=log_dir, mode='online')
+    wandb.init(project='toe', name="legged", dir=log_dir, mode='online')
     args.task = "go2"
     train(args)

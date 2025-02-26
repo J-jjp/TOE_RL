@@ -29,6 +29,7 @@ def play(args):
     # prepare environment
     env, _ = task_registry.make_env(name=args.task, args=args, env_cfg=env_cfg)
     obs = env.get_observations()
+    
     # load policy
     train_cfg.runner.resume = True
     ppo_runner, train_cfg = task_registry.make_alg_runner(env=env, name=args.task, args=args, train_cfg=train_cfg)
@@ -41,6 +42,9 @@ def play(args):
         print('Exported policy as jit script to: ', path)
 
     for i in range(10*int(env.max_episode_length)):
+        env.commands[:,0] = 3
+        env.commands[:,1] = 0
+        env.commands[:,2] = 0
         actions = policy(obs.detach())
         obs, _, rews, dones, infos = env.step(actions.detach())
 

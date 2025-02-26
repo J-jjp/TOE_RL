@@ -1,0 +1,1 @@
+~/MNN/build/MNNConvert -f ONNX --modelFile /home/ubuntu/isaac/TOE_RL/doc/legged.onnx --MNNModel /home/ubuntu/dog/TOE-Dog/legged.mnn --bizCode MNN

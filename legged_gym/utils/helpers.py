@@ -160,7 +160,8 @@ def export_policy_as_jit(actor_critic, path):
         traced_script_module.save(path)
         print("moxing")
         dummy_input = torch.randn(1, 48)  # 根据实际情况调整形状
-        body_onnx_path = '/home/jiaojunpeng/isaac/unitree_rl_gym/doc/' + 'legged.onnx'
+        body_onnx_path = '/home/ubuntu/isaac/TOE_RL/doc/' + 'legged.onnx'
+        print("path:",body_onnx_path)
         torch.onnx.export(model, dummy_input, body_onnx_path, opset_version=11)
 
 class PolicyExporterLSTM(torch.nn.Module):

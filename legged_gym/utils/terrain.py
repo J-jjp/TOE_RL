@@ -7,7 +7,7 @@ from legged_gym.envs.base.legged_robot_config import LeggedRobotCfg
 
 class Terrain:
     def __init__(self, cfg: LeggedRobotCfg.terrain, num_robots) -> None:
-
+        self.difficulty_scale = 0.01
         self.cfg = cfg
         self.num_robots = num_robots
         self.type = cfg.mesh_type
@@ -82,6 +82,7 @@ class Terrain:
                                 length=self.width_per_env_pixels,
                                 vertical_scale=self.cfg.vertical_scale,
                                 horizontal_scale=self.cfg.horizontal_scale)
+        difficulty*=self.difficulty_scale #难度设置
         slope = difficulty * 0.4
         step_height = 0.05 + 0.18 * difficulty
         discrete_obstacles_height = 0.05 + difficulty * 0.2
